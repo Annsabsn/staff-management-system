@@ -52,7 +52,9 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::435756741830:role/GitHubActionsEKSRole
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ap-northeast-1
+          audience: sts.amazonaws.com
+          role-session-name: GitHubActionsEKSDeploy
 
       - name: Configure EKS Kubeconfig
         run: |
