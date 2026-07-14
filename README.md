@@ -705,6 +705,55 @@ AWS Application Load Balancer
 
 ---
 
+## CI/CD Automation with GitHub Actions
+
+The project implements an automated CI/CD pipeline using GitHub Actions.
+
+Whenever code is pushed to the `main` branch, the workflow automatically builds the frontend and backend Docker images, pushes commit-specific images to Docker Hub, authenticates to AWS using GitHub OIDC, connects to the Amazon EKS cluster, and performs Kubernetes rolling updates.
+
+### CI/CD Workflow
+
+```text
+Developer
+    |
+    v
+Git Push
+    |
+    v
+GitHub Actions
+    |
+    +--> Build Frontend Docker Image
+    |
+    +--> Build Backend Docker Image
+    |
+    v
+Docker Hub
+    |
+    v
+GitHub OIDC
+    |
+    v
+AWS IAM Role
+    |
+    v
+Amazon EKS
+    |
+    v
+Kubernetes Rolling Update
+    |
+    v
+Application Load Balancer
+    |
+    v
+Staff Management Application
+```
+
+![GitHub Actions Pipeline](docs/screenshots/14-github-actions-pipeline.png)
+
+The pipeline uses Git commit SHA-based Docker image tags to provide traceable and reproducible Kubernetes deployments.
+
+---
+
 ## Project Structure
 
 ```text
@@ -716,6 +765,10 @@ staff-management-system/
 |
 +-- database/
 |   +-- sams.sql
+|
++-- .github/
+|   +-- workflows/
+|       +-- deploy.yml
 |
 +-- docs/
 |   +-- eks-architecture.png
@@ -734,6 +787,7 @@ staff-management-system/
 |       +-- 11-alb-ingress.png
 |       +-- 12-running-application.png
 |       +-- 13-employee-api.png
+|       +-- 14-github-actions-pipeline.png
 |
 +-- kubernates/
 |   +-- namespace.yaml
@@ -975,6 +1029,10 @@ Persistent MySQL Data        : Verified
 - EKS node group troubleshooting
 - ALB DNS troubleshooting
 - Full-stack application debugging
+- CI/CD pipeline automation with GitHub Actions
+- GitHub OIDC authentication to AWS
+- Commit SHA-based Docker image tagging
+- Automated Kubernetes rolling updates
 
 ---
 
@@ -988,4 +1046,6 @@ Amazon EBS gp3 provides persistent MySQL database storage through the AWS EBS CS
 
 Kubernetes Secrets are used to provide database credentials to the MySQL container, while IAM Roles for Service Accounts provide AWS permissions to Kubernetes workloads and controllers.
 
-The project demonstrates practical experience with AWS, Amazon EKS, Kubernetes, Docker, persistent storage, autoscaling, load balancing, IAM, Helm, application deployment, and real-world cloud troubleshooting.
+A GitHub Actions CI/CD pipeline automates the build and deployment process, using GitHub OIDC to authenticate to AWS and commit SHA-based Docker image tags to perform traceable, reproducible Kubernetes rolling updates.
+
+The project demonstrates practical experience with AWS, Amazon EKS, Kubernetes, Docker, persistent storage, autoscaling, load balancing, IAM, Helm, CI/CD automation, application deployment, and real-world cloud troubleshooting.
