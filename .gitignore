@@ -33,3 +33,5 @@ build/
 
 # Keep SQL Database Script
 !database/sams.sqlkubernates/mysql-secret.yaml
+
+kubernates/mysql-secret.yaml
