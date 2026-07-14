@@ -1,0 +1,91 @@
+name: Staff Management CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  FRONTEND_IMAGE: annasab12/staff-management-frontend
+  BACKEND_IMAGE: annasab12/staff-management-backend
+  AWS_REGION: ap-northeast-1
+  EKS_CLUSTER_NAME: staff-management-cluster
+  K8S_NAMESPACE: staff-management
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./sams-frontend
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+            ${{ env.FRONTEND_IMAGE }}:latest
+
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./sams-backend
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+            ${{ env.BACKEND_IMAGE }}:latest
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::435756741830:role/GitHubActionsEKSRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure EKS Kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region $AWS_REGION \
+            --name $EKS_CLUSTER_NAME
+
+      - name: Deploy Frontend to EKS
+        run: |
+          kubectl set image deployment/staff-frontend \
+            staff-frontend=${FRONTEND_IMAGE}:${GITHUB_SHA} \
+            -n $K8S_NAMESPACE
+
+      - name: Deploy Backend to EKS
+        run: |
+          kubectl set image deployment/staff-backend \
+            staff-backend=${BACKEND_IMAGE}:${GITHUB_SHA} \
+            -n $K8S_NAMESPACE
+
+      - name: Wait for Frontend Rollout
+        run: |
+          kubectl rollout status deployment/staff-frontend \
+            -n $K8S_NAMESPACE \
+            --timeout=300s
+
+      - name: Wait for Backend Rollout
+        run: |
+          kubectl rollout status deployment/staff-backend \
+            -n $K8S_NAMESPACE \
+            --timeout=300s
+
+      - name: Verify Kubernetes Resources
+        run: |
+          kubectl get pods -n $K8S_NAMESPACE
+          kubectl get deployments -n $K8S_NAMESPACE
+          kubectl get ingress -n $K8S_NAMESPACE

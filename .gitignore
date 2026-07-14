@@ -35,3 +35,6 @@ build/
 !database/sams.sqlkubernates/mysql-secret.yaml
 
 kubernates/mysql-secret.yaml
+
+github-actions-eks-policy.json
+github-actions-trust-policy.json
