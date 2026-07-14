@@ -32,4 +32,4 @@ build/
 *.MYI
 
 # Keep SQL Database Script
-!database/sams.sql
+!database/sams.sqlkubernates/mysql-secret.yaml

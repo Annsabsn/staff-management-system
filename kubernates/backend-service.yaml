@@ -6,7 +6,7 @@ metadata:
   namespace: staff-management
 
 spec:
-  type: NodePort
+  type: ClusterIP
 
   selector:
     app: staff-backend
@@ -16,4 +16,3 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30081

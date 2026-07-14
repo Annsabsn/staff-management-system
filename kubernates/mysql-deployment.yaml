@@ -1,5 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: staff-mysql
   namespace: staff-management
@@ -26,7 +27,10 @@ spec:
 
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "root123"
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
 
             - name: MYSQL_DATABASE
               value: "sams_db"
@@ -39,6 +43,7 @@ spec:
             requests:
               cpu: "250m"
               memory: "256Mi"
+
             limits:
               cpu: "500m"
               memory: "512Mi"
